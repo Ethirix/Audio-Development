@@ -3,25 +3,16 @@
 
 #include "WeatherManager.h"
 
+#include "WeatherManagerComponent.h"
 
 
-// Sets default values
 AWeatherManager::AWeatherManager()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	WeatherManagerComponent = CreateDefaultSubobject<UWeatherManagerComponent>(TEXT("Weather Manager Component"));
+	WeatherManagerComponent->RegisterComponent();
 }
 
-// Called when the game starts or when spawned
 void AWeatherManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
-
-// Called every frame
-void AWeatherManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
