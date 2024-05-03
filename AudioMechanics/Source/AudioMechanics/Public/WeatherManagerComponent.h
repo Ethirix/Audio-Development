@@ -16,7 +16,7 @@ class AUDIOMECHANICS_API UWeatherManagerComponent : public UActorComponent
 
 	UPROPERTY(EditAnywhere)
 	TArray<UWeatherState*> WeatherStates;
-	
+
 public:	
 	UWeatherManagerComponent();
 
@@ -24,10 +24,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TArray<UWeatherState*>& GetStates();
-
+	
 	UFUNCTION(BlueprintCallable)
 	void AddState(UWeatherState* State);
-	
+
 protected:
 	virtual void BeginPlay() override;
 };

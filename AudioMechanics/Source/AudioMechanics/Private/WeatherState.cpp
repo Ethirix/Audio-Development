@@ -10,23 +10,20 @@ FString UWeatherState::GetName()
 
 float UWeatherState::GetState() const
 {
-	return FMath::Clamp(State, 0.0f, 1.0f);
+	return State;
 }
 
-void UWeatherState::SetName(FString NewName)
+UMetaSoundSource* UWeatherState::GetSoundFilter() const
 {
-	Name = NewName;
+	return SoundFilter;
 }
 
-void UWeatherState::SetState(const float NewState)
+void UWeatherState::SetState(float NewState)
 {
 	State = FMath::Clamp(NewState, 0.0f, 1.0f);
 }
 
-void UWeatherState::IncrementState(const float Increment)
+void UWeatherState::IncrementState(float Increment)
 {
-	State = FMath::Clamp(State + Increment, 0.0f, 1.0f);;
+	State = FMath::Clamp(State + Increment, 0.0f, 1.0f);
 }
-
-
-
