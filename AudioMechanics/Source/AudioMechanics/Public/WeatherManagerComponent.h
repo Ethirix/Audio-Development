@@ -15,8 +15,13 @@ class AUDIOMECHANICS_API UWeatherManagerComponent : public UActorComponent
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TArray<UWeatherState*> WeatherStates;
+	TArray<TObjectPtr<UWeatherState>> WeatherStates;
 
+	UPROPERTY(EditAnywhere)
+	int BaseWeatherState = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float MaximumWeatherBudget = 1.0f;
 public:	
 	UWeatherManagerComponent();
 
