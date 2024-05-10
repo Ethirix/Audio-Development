@@ -15,20 +15,26 @@ class AUDIOMECHANICS_API UWeatherManagerComponent : public UActorComponent
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<UWeatherState>> WeatherStates;
+	TArray<TObjectPtr<UWeatherState>> Weathers;
 
+	TMap<UWeatherState*, float> WeatherStates;
+		
 	UPROPERTY(EditAnywhere)
 	int BaseWeatherState = 0;
 	
 	UPROPERTY(EditAnywhere)
 	float MaximumWeatherBudget = 1.0f;
+
+	UPROPERTY(VisibleInstanceOnly)
+	float WeatherBudgetUsed = 0.0f;
+	
 public:	
 	UWeatherManagerComponent();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	TArray<UWeatherState*>& GetStates();
+	TMap<UWeatherState*, float>& GetStates();
 	
 	UFUNCTION(BlueprintCallable)
 	void AddState(UWeatherState* State);

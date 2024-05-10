@@ -17,7 +17,7 @@ class AUDIOMECHANICS_API UWeatherState : public UPrimaryDataAsset
 	FString Name;
 
 	UPROPERTY()
-	float State;
+	float State = 0;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMetaSoundSource> SoundFilter;
