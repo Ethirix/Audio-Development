@@ -13,13 +13,13 @@ class AUDIOMECHANICS_API UWeatherState : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditInstanceOnly)
 	FString Name;
 
-	UPROPERTY()
-	float State = 0;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditInstanceOnly, meta=(ClampMin = 0, ClampMax = 1))
+	float MinimumState = 0;
+	
+	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UMetaSoundSource> SoundFilter;
 	
 public:
@@ -28,14 +28,8 @@ public:
 	FString GetName();
 
 	UFUNCTION(BlueprintCallable)
-	float GetState() const;
-
+	float GetMinimumState() const;
+	
 	UFUNCTION(BlueprintCallable)
 	UMetaSoundSource* GetSoundFilter() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetState(float NewState);
-
-	UFUNCTION(BlueprintCallable)
-	void IncrementState(float Increment);
 };

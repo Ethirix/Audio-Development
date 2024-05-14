@@ -15,13 +15,7 @@ void UWeatherManagerComponent::BeginPlay()
 
 	for (UWeatherState* State : Weathers)
 	{
-		State->SetState(0);
-	}
-	
-	if (WeatherStates.Num() - 1 >= BaseWeatherState)
-	{
-		WeatherStates[Weathers[BaseWeatherState]] = MaximumWeatherBudget;
-		WeatherBudgetUsed = MaximumWeatherBudget;
+		WeatherStates.Add(State);
 	}
 }
 
@@ -43,22 +37,12 @@ void UWeatherManagerComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 		const bool bIncreaseThisFrame =
 			WeatherBudgetUsed < MaximumWeatherBudget && FMath::RandBool();
-		const float DeltaState = bIncreaseThisFrame ? DeltaTime : -DeltaTime;
+		const float DeltaState = bIncreaseThisFrame ? DeltaTime : State.Value - DeltaTime >= 0 ? -DeltaTime : 0;
 		WeatherBudgetUsed += DeltaState;
 		State.Value += DeltaState;
 	}
 
-#if UE_BUILD_DEBUG | UE_BUILD_DEVELOPMENT
-	for (const TTuple<UWeatherState*, float>& State : WeatherStates)
-	{
-		if (GEngine)
-		{
-			const int32 Id = State.Key->GetUniqueID();
-			GEngine->AddOnScreenDebugMessage(Id,1.0f, FColor::White,
-				FString::Printf(TEXT("%s: %f"), *State.Key->GetName(), State.Value));
-		}
-	}
-#endif
+	DebugPrint();
 }
 
 TMap<UWeatherState*, float>& UWeatherManagerComponent::GetStates()
@@ -70,3 +54,22 @@ void UWeatherManagerComponent::AddState(UWeatherState* State)
 {
 	WeatherStates.Add(State);
 }
+
+void UWeatherManagerComponent::DebugPrint()
+{
+#if UE_BUILD_DEBUG | UE_BUILD_DEVELOPMENT
+	for (const TTuple<UWeatherState*, float>& State : WeatherStates)
+	{
+		if (GEngine)
+		{
+			const int32 Id = State.Key->GetUniqueID();
+			GEngine->AddOnScreenDebugMessage(Id,1.0f, FColor::White,
+				FString::Printf(TEXT("%s: %f - %s"),
+					*State.Key->GetName(),
+					State.Value,
+					State.Value > State.Key->GetMinimumState() ? TEXT("TRUE") : TEXT("FALSE")));
+		}
+	}
+#endif
+}
+

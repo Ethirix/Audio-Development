@@ -13,20 +13,6 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AUDIOMECHANICS_API UWeatherManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<UWeatherState>> Weathers;
-
-	TMap<UWeatherState*, float> WeatherStates;
-		
-	UPROPERTY(EditAnywhere)
-	int BaseWeatherState = 0;
-	
-	UPROPERTY(EditAnywhere)
-	float MaximumWeatherBudget = 1.0f;
-
-	UPROPERTY(VisibleInstanceOnly)
-	float WeatherBudgetUsed = 0.0f;
 	
 public:	
 	UWeatherManagerComponent();
@@ -41,4 +27,18 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	void DebugPrint();
+	
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<UWeatherState>> Weathers;
+	
+	UPROPERTY(EditAnywhere)
+	float MaximumWeatherBudget = 1.0f;
+
+	UPROPERTY(VisibleInstanceOnly)
+	float WeatherBudgetUsed = 0.0f;
+
+	TMap<UWeatherState*, float> WeatherStates;
 };

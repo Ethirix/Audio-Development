@@ -8,22 +8,12 @@ FString UWeatherState::GetName()
 	return Name;
 }
 
-float UWeatherState::GetState() const
+float UWeatherState::GetMinimumState() const
 {
-	return State;
+	return MinimumState;
 }
 
 UMetaSoundSource* UWeatherState::GetSoundFilter() const
 {
 	return SoundFilter;
-}
-
-void UWeatherState::SetState(float NewState)
-{
-	State = FMath::Clamp(NewState, 0.0f, 1.0f);
-}
-
-void UWeatherState::IncrementState(float Increment)
-{
-	State = FMath::Clamp(State + Increment, 0.0f, 1.0f);
 }
