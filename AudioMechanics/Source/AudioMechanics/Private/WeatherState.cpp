@@ -13,7 +13,15 @@ float UWeatherState::GetMinimumState() const
 	return MinimumState;
 }
 
-UMetaSoundSource* UWeatherState::GetSoundFilter() const
+float UWeatherState::GetLinearVolumeLevel(float State) const
 {
-	return SoundFilter;
+	float CurrentLevel = State - MinimumState;
+	float Multiplier = 1.0f / (1.0f - MinimumState);
+
+	return FMath::Clamp(CurrentLevel * Multiplier, 0.0f, 1.0f);
+}
+
+USoundBase* UWeatherState::GetSound() const
+{
+	return Sound;
 }

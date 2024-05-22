@@ -2,6 +2,8 @@
 
 
 #include "WeatherManagerComponent.h"
+
+#include "ActiveSoundStruct.h"
 #include "WeatherState.h"
 
 UWeatherManagerComponent::UWeatherManagerComponent()
@@ -22,27 +24,72 @@ void UWeatherManagerComponent::BeginPlay()
 void UWeatherManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (WeatherBudgetUsed > MaximumWeatherBudget)
-	{
-		WeatherBudgetUsed = MaximumWeatherBudget;
-	}
 	
-	for (TTuple<UWeatherState*, float>& State : WeatherStates)
-	{
-		if (const bool bChangeThisFrame = FMath::RandBool(); !bChangeThisFrame)
-		{
-			continue;
-		}
-
-		const bool bIncreaseThisFrame =
-			WeatherBudgetUsed < MaximumWeatherBudget && FMath::RandBool();
-		const float DeltaState = bIncreaseThisFrame ? DeltaTime : State.Value - DeltaTime >= 0 ? -DeltaTime : 0;
-		WeatherBudgetUsed += DeltaState;
-		State.Value += DeltaState;
-	}
+	UpdateStates(DeltaTime);
 
 	DebugPrint();
+}
+
+void UWeatherManagerComponent::UpdateStates(float DeltaTime)
+{
+	for (TTuple<UWeatherState*, float>& State : WeatherStates)
+	{
+		UpdateBudget();
+
+		int StateChange = FMath::RandRange(-1, 1);
+		if (WeatherBudgetUsed >= MaximumWeatherBudget || State.Value >= 1)
+		{
+			StateChange = -1;
+		}
+
+		switch (StateChange)
+		{
+		case -1:
+			State.Value -= DeltaTime;
+			if (State.Value < 0)
+			{
+				State.Value = 0;
+			}
+			break;
+		case 1:
+			if (WeatherBudgetUsed + DeltaTime > MaximumWeatherBudget)
+			{
+				break;
+			}
+			
+			State.Value += DeltaTime;
+			if (State.Value > 1)
+			{
+				State.Value = 1;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void UWeatherManagerComponent::UpdateBudget()
+{
+	WeatherBudgetUsed = 0;
+	for (TTuple<UWeatherState*, float> State : WeatherStates)
+	{
+		WeatherBudgetUsed += State.Value;
+	}
+}
+
+TArray<FActiveSoundStruct> UWeatherManagerComponent::GetActiveSounds()
+{
+	TArray<FActiveSoundStruct> Sounds;
+	for (TTuple<UWeatherState*, float> State : WeatherStates)
+	{
+		if (State.Key->GetMinimumState() <= State.Value)
+		{
+			Sounds.Emplace(State.Key->GetSound(), State.Key->GetLinearVolumeLevel(State.Value));
+		}
+	}
+
+	return Sounds;
 }
 
 TMap<UWeatherState*, float>& UWeatherManagerComponent::GetStates()
@@ -72,4 +119,3 @@ void UWeatherManagerComponent::DebugPrint()
 	}
 #endif
 }
-

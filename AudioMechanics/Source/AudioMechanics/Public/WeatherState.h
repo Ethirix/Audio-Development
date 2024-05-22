@@ -20,7 +20,7 @@ class AUDIOMECHANICS_API UWeatherState : public UPrimaryDataAsset
 	float MinimumState = 0;
 	
 	UPROPERTY(EditInstanceOnly)
-	TObjectPtr<UMetaSoundSource> SoundFilter;
+	TObjectPtr<USoundBase> Sound;
 	
 public:
 
@@ -29,7 +29,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetMinimumState() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetLinearVolumeLevel(float State) const;
 	
 	UFUNCTION(BlueprintCallable)
-	UMetaSoundSource* GetSoundFilter() const;
+	USoundBase* GetSound() const;
 };

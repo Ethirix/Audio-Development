@@ -7,6 +7,7 @@
 #include "WeatherManagerComponent.generated.h"
 
 
+struct FActiveSoundStruct;
 class UWeatherState;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -30,6 +31,12 @@ protected:
 
 private:
 	void DebugPrint();
+
+	void UpdateBudget();
+
+	void UpdateStates(float DeltaTime);
+
+	TArray<FActiveSoundStruct> GetActiveSounds();
 	
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UWeatherState>> Weathers;
@@ -40,5 +47,6 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	float WeatherBudgetUsed = 0.0f;
 
+	UPROPERTY(VisibleInstanceOnly)
 	TMap<UWeatherState*, float> WeatherStates;
 };

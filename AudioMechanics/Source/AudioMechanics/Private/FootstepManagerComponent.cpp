@@ -37,7 +37,8 @@ void UFootstepManagerComponent::BeginPlay()
 	}
 }
 
-void UFootstepManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UFootstepManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                              FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
