@@ -76,11 +76,11 @@ void UFootstepManagerComponent::OnLeftFootBeginOverlap(UPrimitiveComponent* Over
 {
 	UStepSoundComponent* SoundComponent = Cast<UStepSoundComponent>(
 		OtherActor->GetComponentByClass(UStepSoundComponent::StaticClass()));
-	if (OtherActor == Owner || bLeftFootCollided || !SoundComponent)
+	if (OtherActor == Owner || !SoundComponent || LeftFootCollidingWith.Num() > 0)
 	{
 		return;
 	}
-	bLeftFootCollided = true;
+	LeftFootCollidingWith.Add(OtherActor);
 	
 	RunFootstep(LeftFootCollider, SoundComponent);
 	
@@ -90,7 +90,7 @@ void UFootstepManagerComponent::OnLeftFootBeginOverlap(UPrimitiveComponent* Over
 void UFootstepManagerComponent::OnLeftFootEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                      UPrimitiveComponent* OtherComp, signed int OtherBodyIndex)
 {
-	bLeftFootCollided = false;
+	LeftFootCollidingWith.Remove(OtherActor);
 }
 
 void UFootstepManagerComponent::OnRightFootBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -99,11 +99,12 @@ void UFootstepManagerComponent::OnRightFootBeginOverlap(UPrimitiveComponent* Ove
 {
 	UStepSoundComponent* SoundComponent = Cast<UStepSoundComponent>(
 		OtherActor->GetComponentByClass(UStepSoundComponent::StaticClass()));
-	if (OtherActor == Owner || bRightFootCollided || !SoundComponent)
+	if (OtherActor == Owner || !SoundComponent || RightFootCollidingWith.Num() > 0)
 	{
 		return;
 	}
-	bRightFootCollided = true;
+	RightFootCollidingWith.Add(OtherActor);
+	
 
 	RunFootstep(RightFootCollider, SoundComponent);
 	
@@ -113,7 +114,7 @@ void UFootstepManagerComponent::OnRightFootBeginOverlap(UPrimitiveComponent* Ove
 void UFootstepManagerComponent::OnRightFootEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                       UPrimitiveComponent* OtherComp, signed int OtherBodyIndex)
 {
-	bRightFootCollided = false;
+	RightFootCollidingWith.Remove(OtherActor);
 }
 
 void UFootstepManagerComponent::RunFootstep(UPrimitiveComponent* FootColliderComponent,

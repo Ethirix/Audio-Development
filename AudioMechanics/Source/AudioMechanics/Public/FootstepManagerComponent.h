@@ -34,6 +34,10 @@ class AUDIOMECHANICS_API UFootstepManagerComponent : public UActorComponent
 	TObjectPtr<UAudioComponent> LeftFootAudioComponent;
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> RightFootAudioComponent;
+	UPROPERTY(VisibleInstanceOnly)
+	TArray<AActor*> LeftFootCollidingWith;
+	UPROPERTY(VisibleInstanceOnly)
+	TArray<AActor*> RightFootCollidingWith;
 
 	UPROPERTY(VisibleInstanceOnly)
 	bool bLeftFootCollided = false;
