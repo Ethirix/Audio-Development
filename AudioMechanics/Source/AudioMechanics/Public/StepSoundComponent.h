@@ -11,7 +11,7 @@ class AUDIOMECHANICS_API UStepSoundComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> Sound;
 	
 public:

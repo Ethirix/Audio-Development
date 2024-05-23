@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddState(UWeatherState* State);
 
+	UFUNCTION(BlueprintCallable)
+	TArray<FActiveSoundStruct> GetActiveSounds();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,8 +38,6 @@ private:
 	void UpdateBudget();
 
 	void UpdateStates(float DeltaTime);
-
-	TArray<FActiveSoundStruct> GetActiveSounds();
 	
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UWeatherState>> Weathers;

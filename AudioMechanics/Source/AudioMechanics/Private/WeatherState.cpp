@@ -15,6 +15,8 @@ float UWeatherState::GetMinimumState() const
 
 float UWeatherState::GetLinearVolumeLevel(float State) const
 {
+	return State;
+	
 	float CurrentLevel = State - MinimumState;
 	float Multiplier = 1.0f / (1.0f - MinimumState);
 

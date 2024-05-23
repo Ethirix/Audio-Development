@@ -3,6 +3,13 @@
 
 #include "FootstepManagerComponent.h"
 
+#include "ActiveSoundStruct.h"
+#include "StepSoundComponent.h"
+#include "WeatherManager.h"
+#include "WeatherManagerComponent.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 UFootstepManagerComponent::UFootstepManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -12,12 +19,22 @@ void UFootstepManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Owner = GetOwner();
-	
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWeatherManager::StaticClass(), FoundActors);
+	if (FoundActors.Num() > 0)
+	{
+		WeatherManagerComponent = Cast<UWeatherManagerComponent>(
+			FoundActors[0]->GetComponentByClass(UWeatherManagerComponent::StaticClass()));
+	}
+		
 	LeftFootCollider = Cast<UPrimitiveComponent>(LeftFootColliderReference.GetComponent(Owner));
 	RightFootCollider = Cast<UPrimitiveComponent>(RightFootColliderReference.GetComponent(Owner));
+	LeftFootAudioComponent = Cast<UAudioComponent>(LeftFootAudioReference.GetComponent(Owner));
+	RightFootAudioComponent = Cast<UAudioComponent>(RightFootAudioReference.GetComponent(Owner));
 
 	if (!LeftFootCollider)
-	{
+	{	
 		DebugNoPrimitiveComponent("Left Foot Collider");
 	}
 	else
@@ -35,6 +52,16 @@ void UFootstepManagerComponent::BeginPlay()
 		RightFootCollider->OnComponentBeginOverlap.AddDynamic(this, &UFootstepManagerComponent::OnRightFootBeginOverlap);
 		RightFootCollider->OnComponentEndOverlap.AddDynamic(this, &UFootstepManagerComponent::OnRightFootEndOverlap);
 	}
+
+	if (!LeftFootAudioComponent)
+	{
+		DebugNoAudioComponent("Left Foot Audio Component");
+	}
+
+	if (!RightFootAudioComponent)
+	{
+		DebugNoAudioComponent("Right Foot Audio Component");
+	}
 }
 
 void UFootstepManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -47,11 +74,15 @@ void UFootstepManagerComponent::OnLeftFootBeginOverlap(UPrimitiveComponent* Over
                                                        UPrimitiveComponent* OtherComp, signed int OtherBodyIndex,
                                                        bool FromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor == Owner || bLeftFootCollided)
+	UStepSoundComponent* SoundComponent = Cast<UStepSoundComponent>(
+		OtherActor->GetComponentByClass(UStepSoundComponent::StaticClass()));
+	if (OtherActor == Owner || bLeftFootCollided || !SoundComponent)
 	{
 		return;
 	}
 	bLeftFootCollided = true;
+	
+	RunFootstep(LeftFootCollider, SoundComponent);
 	
 	DebugCollidedObject(OtherActor, FColor::Cyan);
 }
@@ -66,11 +97,15 @@ void UFootstepManagerComponent::OnRightFootBeginOverlap(UPrimitiveComponent* Ove
                                                         UPrimitiveComponent* OtherComp, signed int OtherBodyIndex,
                                                         bool FromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor == Owner || bRightFootCollided)
+	UStepSoundComponent* SoundComponent = Cast<UStepSoundComponent>(
+		OtherActor->GetComponentByClass(UStepSoundComponent::StaticClass()));
+	if (OtherActor == Owner || bRightFootCollided || !SoundComponent)
 	{
 		return;
 	}
 	bRightFootCollided = true;
+
+	RunFootstep(RightFootCollider, SoundComponent);
 	
 	DebugCollidedObject(OtherActor, FColor::Magenta);
 }
@@ -79,6 +114,25 @@ void UFootstepManagerComponent::OnRightFootEndOverlap(UPrimitiveComponent* Overl
                                                       UPrimitiveComponent* OtherComp, signed int OtherBodyIndex)
 {
 	bRightFootCollided = false;
+}
+
+void UFootstepManagerComponent::RunFootstep(UPrimitiveComponent* FootColliderComponent,
+                                            UStepSoundComponent* StepSoundComponent)
+{
+	TArray<FActiveSoundStruct> ActiveSounds = WeatherManagerComponent->GetActiveSounds();
+	float TotalVolume = 0.0f;
+	for (FActiveSoundStruct ActiveSound : ActiveSounds)
+	{
+		TotalVolume += ActiveSound.LinearVolume;
+	}
+	
+	ActiveSounds.Emplace(StepSoundComponent->GetSound(), 1 - TotalVolume);
+	for (FActiveSoundStruct Sound : ActiveSounds)
+	{
+		LeftFootAudioComponent->Sound = Sound.Sound;
+		LeftFootAudioComponent->VolumeMultiplier = Sound.LinearVolume;
+		LeftFootAudioComponent->Play();
+	}
 }
 
 void UFootstepManagerComponent::DebugNoPrimitiveComponent(const FString& Name)
@@ -92,6 +146,22 @@ void UFootstepManagerComponent::DebugNoPrimitiveComponent(const FString& Name)
 			FColor::Red,
 			FString::Printf(
 				TEXT("Did not find a valid Primative Component for %s!"),
+				*Name));
+	}
+#endif
+}
+
+void UFootstepManagerComponent::DebugNoAudioComponent(const FString& Name)
+{
+#ifdef WITH_EDITORONLY_DATA
+	if (GEngine && bPrintDebug)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			INDEX_NONE,
+			10.0f,
+			FColor::Red,
+			FString::Printf(
+				TEXT("Did not find a valid Audio Component for %s!"),
 				*Name));
 	}
 #endif
